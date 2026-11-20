@@ -111,9 +111,9 @@ export class NexusGame {
     return true;
   }
 
-  clearLines(row: number, col: number): number {
+  findLine(row: number, col: number): Cell[] {
     const ball = this.board[row][col];
-    if (ball === 0) return 0;
+    if (ball === 0) return [];
 
     const directions = [
       [0, 1],
@@ -147,22 +147,38 @@ export class NexusGame {
       }
     }
 
-    for (const key of toClear) {
-      const [clearedRow, clearedCol] = key.split(":").map(Number);
-      this.board[clearedRow][clearedCol] = 0;
+    return Array.from(toClear, (key) => {
+      const [lineRow, lineCol] = key.split(":").map(Number);
+      return { row: lineRow, col: lineCol };
+    });
+  }
+
+  clearLines(row: number, col: number): number {
+    const line = this.findLine(row, col);
+    if (line.length === 0) return 0;
+
+    for (const cell of line) {
+      this.board[cell.row][cell.col] = 0;
     }
-    this.score += toClear.size * 5;
-    return toClear.size;
+    this.score += line.length * 5;
+    return line.length;
+  }
+
+  addRandomBall(): Cell | null {
+    const free = this.freeCells();
+    if (free.length === 0) return null;
+
+    const position = free[Math.floor(Math.random() * free.length)];
+    const ball = (Math.floor(Math.random() * 5) + 1) as Ball;
+    this.addBall(position.row, position.col, ball);
+    return position;
   }
 
   addRandomBalls(count: number): number {
     let added = 0;
     for (let i = 0; i < count; i++) {
-      const free = this.freeCells();
-      if (free.length === 0) break;
-      const position = free[Math.floor(Math.random() * free.length)];
-      const ball = (Math.floor(Math.random() * 5) + 1) as Ball;
-      this.addBall(position.row, position.col, ball);
+      const position = this.addRandomBall();
+      if (!position) break;
       added++;
       this.clearLines(position.row, position.col);
     }

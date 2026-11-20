@@ -103,6 +103,16 @@ h1 span {
   filter: brightness(1.25);
 }
 
+.cell.clearing {
+  animation: line-clear-blink 300ms ease-in-out 2;
+}
+
+@keyframes line-clear-blink {
+  50% {
+    opacity: 0.55;
+  }
+}
+
 .controls {
   display: flex;
   flex-direction: column;

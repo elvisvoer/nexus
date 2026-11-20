@@ -38,6 +38,7 @@ const startElement = document.querySelector<HTMLButtonElement>("#start")!;
 let moving = false;
 let turn = 0;
 let selectionVisible = true;
+const clearingCells = new Set<string>();
 
 const assetUrl = (file: string) => `${import.meta.env.BASE_URL}assets/${file}`;
 
@@ -85,6 +86,9 @@ function render(): void {
           ? `url("${assetUrl("selected.png")}"), ${baseImage}`
           : baseImage;
       }
+      if (clearingCells.has(`${row}:${col}`)) {
+        cell.classList.add("clearing");
+      }
       cell.setAttribute(
         "aria-label",
         value
@@ -96,12 +100,12 @@ function render(): void {
   scoreElement.textContent = game.score.toString().padStart(8, "0");
 }
 
-function animatePath(path: Cell[]): Promise<void> {
+function animatePath(path: Cell[], expectedTurn: number): Promise<boolean> {
   return new Promise((resolve) => {
     const original = path[0];
     const ball = game.board[original.row][original.col];
     if (ball === 0) {
-      resolve();
+      resolve(false);
       return;
     }
 
@@ -110,6 +114,12 @@ function animatePath(path: Cell[]): Promise<void> {
     render();
 
     const timer = window.setInterval(() => {
+      if (turn !== expectedTurn) {
+        window.clearInterval(timer);
+        resolve(false);
+        return;
+      }
+
       const current = path[index];
       const previous = path[index - 1];
       game.board[current.row][current.col] = ball;
@@ -121,10 +131,56 @@ function animatePath(path: Cell[]): Promise<void> {
 
       if (index >= path.length) {
         window.clearInterval(timer);
-        resolve();
+        resolve(true);
       }
     }, 45);
   });
+}
+
+function delay(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+}
+
+async function clearLinesWithAnimation(
+  row: number,
+  col: number,
+  expectedTurn: number,
+): Promise<boolean> {
+  const line = game.findLine(row, col);
+  if (line.length === 0) return true;
+
+  for (const cell of line) clearingCells.add(`${cell.row}:${cell.col}`);
+  render();
+  await delay(600);
+
+  if (turn !== expectedTurn) return false;
+
+  game.clearLines(row, col);
+  for (const cell of line) clearingCells.delete(`${cell.row}:${cell.col}`);
+  render();
+  return true;
+}
+
+async function addRandomBallsWithAnimation(
+  count: number,
+  expectedTurn: number,
+): Promise<void> {
+  moving = true;
+  for (let i = 0; i < count; i++) {
+    if (turn !== expectedTurn) return;
+
+    const position = game.addRandomBall();
+    if (!position) break;
+    render();
+    const completed = await clearLinesWithAnimation(
+      position.row,
+      position.col,
+      expectedTurn,
+    );
+    if (!completed) return;
+  }
+  if (turn === expectedTurn) moving = false;
+  render();
 }
 
 async function handleCellClick(cell: Cell): Promise<void> {
@@ -146,16 +202,21 @@ async function handleCellClick(cell: Cell): Promise<void> {
   game.selected = null;
   moving = true;
   const moveTurn = turn;
-  await animatePath(path);
+  const completed = await animatePath(path, moveTurn);
+  if (!completed || turn !== moveTurn) return;
   game.board[from.row][from.col] = 0;
   game.board[cell.row][cell.col] = ball;
-  game.clearLines(cell.row, cell.col);
+  const cleared = await clearLinesWithAnimation(
+    cell.row,
+    cell.col,
+    moveTurn,
+  );
+  if (!cleared || turn !== moveTurn) return;
   moving = false;
 
   window.setTimeout(() => {
     if (!game.started || turn !== moveTurn) return;
-    game.addRandomBalls(3);
-    render();
+    void addRandomBallsWithAnimation(3, moveTurn);
   }, 250);
   render();
 }
@@ -163,9 +224,12 @@ async function handleCellClick(cell: Cell): Promise<void> {
 startElement.addEventListener("click", () => {
   game.start();
   turn++;
-  game.addRandomBalls(3);
+  const startTurn = turn;
+  moving = true;
+  clearingCells.clear();
   startElement.textContent = "Restart";
   render();
+  void addRandomBallsWithAnimation(3, startTurn);
 });
 
 window.setInterval(() => {
