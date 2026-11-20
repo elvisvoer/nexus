@@ -12,7 +12,8 @@
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at 20% 15%, rgba(56, 189, 248, 0.08), transparent 24rem),
     radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08), transparent 28rem),
@@ -183,11 +184,22 @@ h1 span {
 @media (max-width: 600px) {
   .game-shell {
     width: min(480px, calc(100vw - 20px));
-    padding-top: 18px;
+    height: 100dvh;
+    padding: 12px 0;
+  }
+
+  .topbar {
+    margin-bottom: 12px;
   }
 
   .game-layout {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .board {
+    width: min(100%, calc(100dvh - 150px));
+    justify-self: center;
   }
 
   .controls {
