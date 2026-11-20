@@ -164,13 +164,16 @@ export class NexusGame {
     return line.length;
   }
 
-  addRandomBall(): Cell | null {
+  randomBall(): Ball {
+    return (Math.floor(Math.random() * 5) + 1) as Ball;
+  }
+
+  addRandomBall(ball?: Ball): Cell | null {
     const free = this.freeCells();
     if (free.length === 0) return null;
 
     const position = free[Math.floor(Math.random() * free.length)];
-    const ball = (Math.floor(Math.random() * 5) + 1) as Ball;
-    this.addBall(position.row, position.col, ball);
+    this.addBall(position.row, position.col, ball ?? this.randomBall());
     return position;
   }
 

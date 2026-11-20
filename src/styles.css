@@ -109,7 +109,7 @@ h1 span {
 
 @keyframes line-clear-blink {
   50% {
-    opacity: 0.55;
+    opacity: 0.75;
   }
 }
 
@@ -117,6 +117,35 @@ h1 span {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.next-balls {
+  display: grid;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.next-balls-label {
+  color: #94a3b8;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.next-balls-preview {
+  display: flex;
+  gap: 8px;
+}
+
+.next-ball {
+  flex: 0 0 30px;
+  height: 30px;
+  border: 1px solid #475569;
+  border-radius: 50%;
+  background-color: #111827;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .controls button {
@@ -146,34 +175,6 @@ h1 span {
   background: #1e293b;
 }
 
-.legend {
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: repeat(5, 18px);
-  gap: 7px;
-  color: #94a3b8;
-  font-size: 0.72rem;
-}
-
-.legend p {
-  grid-column: 1 / -1;
-  margin: 8px 0 0;
-  line-height: 1.4;
-}
-
-.legend-dot {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  box-shadow: inset -3px -4px 7px rgba(0, 0, 0, 0.32);
-}
-
-.blue { background: #60a5fa; }
-.red { background: #f87171; }
-.green { background: #4ade80; }
-.yellow { background: #facc15; }
-.purple { background: #c084fc; }
-
 @media (max-width: 600px) {
   .game-shell {
     width: min(480px, calc(100vw - 20px));
@@ -189,7 +190,4 @@ h1 span {
     grid-template-columns: 1fr 1fr;
   }
 
-  .legend {
-    display: none;
-  }
 }

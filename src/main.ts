@@ -1,5 +1,5 @@
 import "./styles.css";
-import { BOARD_SIZE, NexusGame, type Cell } from "./game";
+import { BOARD_SIZE, NexusGame, type Ball, type Cell } from "./game";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root not found");
@@ -18,13 +18,14 @@ app.innerHTML = `
       <div id="board" class="board" role="grid" aria-label="Nexus game board"></div>
       <aside class="controls">
         <button id="start" class="primary">Start</button>
-        <div class="legend">
-          <span class="legend-dot blue"></span>
-          <span class="legend-dot red"></span>
-          <span class="legend-dot green"></span>
-          <span class="legend-dot yellow"></span>
-          <span class="legend-dot purple"></span>
-          <p>Align five or more balls</p>
+        <div class="next-balls">
+          <span class="next-balls-label">Next</span>
+          <div
+            id="next-balls"
+            class="next-balls-preview"
+            role="list"
+            aria-label="Next three balls"
+          ></div>
         </div>
       </aside>
     </section>
@@ -35,6 +36,7 @@ const game = new NexusGame();
 const boardElement = document.querySelector<HTMLDivElement>("#board")!;
 const scoreElement = document.querySelector<HTMLElement>("#score")!;
 const startElement = document.querySelector<HTMLButtonElement>("#start")!;
+const nextBallsElement = document.querySelector<HTMLDivElement>("#next-balls")!;
 let moving = false;
 let turn = 0;
 let selectionVisible = true;
@@ -51,6 +53,19 @@ const ballImages = [
   assetUrl("purple.png"),
 ];
 
+const ballNames: Record<Ball, string> = {
+  1: "Blue",
+  2: "Red",
+  3: "Green",
+  4: "Yellow",
+  5: "Purple",
+};
+let upcomingBalls: Ball[] = [
+  game.randomBall(),
+  game.randomBall(),
+  game.randomBall(),
+];
+
 const cells: HTMLButtonElement[][] = [];
 
 for (let row = 0; row < BOARD_SIZE; row++) {
@@ -64,6 +79,19 @@ for (let row = 0; row < BOARD_SIZE; row++) {
     cells[row][col] = cell;
     boardElement.append(cell);
   }
+}
+
+function renderNextBalls(): void {
+  nextBallsElement.replaceChildren(
+    ...upcomingBalls.map((ball, index) => {
+      const preview = document.createElement("span");
+      preview.className = "next-ball";
+      preview.style.backgroundImage = `url("${ballImages[ball]}")`;
+      preview.setAttribute("role", "listitem");
+      preview.setAttribute("aria-label", `${index + 1}: ${ballNames[ball]}`);
+      return preview;
+    }),
+  );
 }
 
 function render(): void {
@@ -169,8 +197,11 @@ async function addRandomBallsWithAnimation(
   for (let i = 0; i < count; i++) {
     if (turn !== expectedTurn) return;
 
-    const position = game.addRandomBall();
+    const position = game.addRandomBall(upcomingBalls[0]);
     if (!position) break;
+    upcomingBalls.shift();
+    upcomingBalls.push(game.randomBall());
+    renderNextBalls();
     render();
     const completed = await clearLinesWithAnimation(
       position.row,
@@ -225,9 +256,11 @@ startElement.addEventListener("click", () => {
   game.start();
   turn++;
   const startTurn = turn;
+  upcomingBalls = [game.randomBall(), game.randomBall(), game.randomBall()];
   moving = true;
   clearingCells.clear();
   startElement.textContent = "Restart";
+  renderNextBalls();
   render();
   void addRandomBallsWithAnimation(3, startTurn);
 });
@@ -239,4 +272,5 @@ window.setInterval(() => {
   }
 }, 300);
 
+renderNextBalls();
 render();
