@@ -39,13 +39,15 @@ let moving = false;
 let turn = 0;
 let selectionVisible = true;
 
+const assetUrl = (file: string) => `${import.meta.env.BASE_URL}assets/${file}`;
+
 const ballImages = [
   "",
-  "/assets/blue.png",
-  "/assets/red.png",
-  "/assets/green.png",
-  "/assets/yellow.png",
-  "/assets/purple.png",
+  assetUrl("blue.png"),
+  assetUrl("red.png"),
+  assetUrl("green.png"),
+  assetUrl("yellow.png"),
+  assetUrl("purple.png"),
 ];
 
 const cells: HTMLButtonElement[][] = [];
@@ -71,7 +73,7 @@ function render(): void {
       cell.className = "cell";
       const baseImage = value
         ? `url("${ballImages[value]}")`
-        : `url("/assets/free.png")`;
+        : `url("${assetUrl("free.png")}")`;
       cell.style.backgroundImage = baseImage;
 
       if (
@@ -80,7 +82,7 @@ function render(): void {
       ) {
         cell.classList.add("selected");
         cell.style.backgroundImage = selectionVisible
-          ? `url("/assets/selected.png"), ${baseImage}`
+          ? `url("${assetUrl("selected.png")}"), ${baseImage}`
           : baseImage;
       }
       cell.setAttribute(
