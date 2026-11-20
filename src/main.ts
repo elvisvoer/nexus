@@ -9,8 +9,14 @@ app.innerHTML = `
     <header class="topbar">
       <h1>Nexus <span>2k</span></h1>
       <div class="score-wrap">
-        <span>Score</span>
-        <strong id="score">00000000</strong>
+        <div class="score-item">
+          <span>Best</span>
+          <strong id="high-score">00000000</strong>
+        </div>
+        <div class="score-item">
+          <span>Current</span>
+          <strong id="score">00000000</strong>
+        </div>
       </div>
     </header>
 
@@ -35,12 +41,28 @@ app.innerHTML = `
 const game = new NexusGame();
 const boardElement = document.querySelector<HTMLDivElement>("#board")!;
 const scoreElement = document.querySelector<HTMLElement>("#score")!;
+const highScoreElement = document.querySelector<HTMLElement>("#high-score")!;
 const startElement = document.querySelector<HTMLButtonElement>("#start")!;
 const nextBallsElement = document.querySelector<HTMLDivElement>("#next-balls")!;
+const highScoreStorageKey = "nexus-2k-high-score";
 let moving = false;
 let turn = 0;
 let selectionVisible = true;
 const clearingCells = new Set<string>();
+
+function loadHighScore(): number {
+  const stored = window.localStorage.getItem(highScoreStorageKey);
+  if (stored === null) return 0;
+
+  const score = Number(stored);
+  if (!Number.isSafeInteger(score) || score < 0) {
+    console.error("Ignoring invalid saved high score:", stored);
+    return 0;
+  }
+  return score;
+}
+
+let highScore = loadHighScore();
 
 const assetUrl = (file: string) => `${import.meta.env.BASE_URL}assets/${file}`;
 
@@ -125,7 +147,12 @@ function render(): void {
       );
     }
   }
+  if (game.score > highScore) {
+    highScore = game.score;
+    window.localStorage.setItem(highScoreStorageKey, String(highScore));
+  }
   scoreElement.textContent = game.score.toString().padStart(8, "0");
+  highScoreElement.textContent = highScore.toString().padStart(8, "0");
 }
 
 function animatePath(path: Cell[], expectedTurn: number): Promise<boolean> {

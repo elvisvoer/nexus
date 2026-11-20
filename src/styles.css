@@ -50,12 +50,17 @@ h1 span {
 }
 
 .score-wrap {
-  display: grid;
+  display: flex;
+  gap: 12px;
   text-align: right;
   color: #94a3b8;
   text-transform: uppercase;
   font-size: 0.7rem;
   letter-spacing: 0.16em;
+}
+
+.score-item {
+  display: grid;
 }
 
 .score-wrap strong {
@@ -190,4 +195,14 @@ h1 span {
     grid-template-columns: 1fr 1fr;
   }
 
+}
+
+@media (max-width: 380px) {
+  .score-wrap {
+    gap: 6px;
+  }
+
+  .score-wrap strong {
+    font-size: 1rem;
+  }
 }
