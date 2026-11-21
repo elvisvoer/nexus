@@ -264,6 +264,7 @@ async function handleCellClick(cell: Cell): Promise<void> {
   if (!completed || turn !== moveTurn) return;
   game.board[from.row][from.col] = 0;
   game.board[cell.row][cell.col] = ball;
+  const lineCompleted = game.findLine(cell.row, cell.col).length > 0;
   const cleared = await clearLinesWithAnimation(
     cell.row,
     cell.col,
@@ -272,10 +273,12 @@ async function handleCellClick(cell: Cell): Promise<void> {
   if (!cleared || turn !== moveTurn) return;
   moving = false;
 
-  window.setTimeout(() => {
-    if (!game.started || turn !== moveTurn) return;
-    void addRandomBallsWithAnimation(3, moveTurn);
-  }, 250);
+  if (!lineCompleted) {
+    window.setTimeout(() => {
+      if (!game.started || turn !== moveTurn) return;
+      void addRandomBallsWithAnimation(3, moveTurn);
+    }, 250);
+  }
   render();
 }
 
