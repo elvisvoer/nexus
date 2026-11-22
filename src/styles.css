@@ -313,6 +313,16 @@ h1 span {
     grid-template-columns: 1fr 1fr;
   }
 
+  .controls button {
+    height: 50px;
+    font-size: 0.68rem;
+  }
+
+  .next-balls {
+    padding: 0;
+    margin-left: 20px;
+  }
+
 }
 
 @media (max-width: 380px) {
