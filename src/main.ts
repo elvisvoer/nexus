@@ -21,7 +21,21 @@ app.innerHTML = `
     </header>
 
     <section class="game-layout">
-      <div id="board" class="board" role="grid" aria-label="Nexus game board"></div>
+      <div class="board-wrap">
+        <div id="board" class="board" role="grid" aria-label="Nexus game board"></div>
+        <div id="game-over" class="game-over" role="dialog" aria-modal="true" aria-labelledby="game-over-title" hidden>
+          <div class="game-over-card">
+            <span class="game-over-eyebrow">No moves left</span>
+            <h2 id="game-over-title">Game Over</h2>
+            <p class="game-over-copy">No clear path remains. Ready for another round?</p>
+            <div class="game-over-score">
+              <span>Final score</span>
+              <strong id="final-score">00000000</strong>
+            </div>
+            <button id="game-over-restart" class="primary">Play again</button>
+          </div>
+        </div>
+      </div>
       <aside class="controls">
         <button id="start" class="primary">Start</button>
         <div class="next-balls">
@@ -44,8 +58,13 @@ const scoreElement = document.querySelector<HTMLElement>("#score")!;
 const highScoreElement = document.querySelector<HTMLElement>("#high-score")!;
 const startElement = document.querySelector<HTMLButtonElement>("#start")!;
 const nextBallsElement = document.querySelector<HTMLDivElement>("#next-balls")!;
+const gameOverElement = document.querySelector<HTMLDivElement>("#game-over")!;
+const finalScoreElement = document.querySelector<HTMLElement>("#final-score")!;
+const gameOverRestartElement =
+  document.querySelector<HTMLButtonElement>("#game-over-restart")!;
 const highScoreStorageKey = "nexus-2k-high-score";
 let moving = false;
+let gameOver = false;
 let turn = 0;
 let selectionVisible = true;
 const clearingCells = new Set<string>();
@@ -155,6 +174,13 @@ function render(): void {
   highScoreElement.textContent = highScore.toString().padStart(8, "0");
 }
 
+function showGameOver(): void {
+  gameOver = true;
+  finalScoreElement.textContent = game.score.toString().padStart(8, "0");
+  gameOverElement.hidden = false;
+  gameOverRestartElement.focus();
+}
+
 function animatePath(path: Cell[], expectedTurn: number): Promise<boolean> {
   return new Promise((resolve) => {
     const original = path[0];
@@ -239,10 +265,11 @@ async function addRandomBallsWithAnimation(
   }
   if (turn === expectedTurn) moving = false;
   render();
+  if (turn === expectedTurn && !game.hasAvailableMove()) showGameOver();
 }
 
 async function handleCellClick(cell: Cell): Promise<void> {
-  if (!game.started || moving) return;
+  if (!game.started || moving || gameOver) return;
   const value = game.at(cell);
 
   if (value !== 0) {
@@ -278,14 +305,19 @@ async function handleCellClick(cell: Cell): Promise<void> {
       if (!game.started || turn !== moveTurn) return;
       void addRandomBallsWithAnimation(3, moveTurn);
     }, 250);
+  } else if (!game.hasAvailableMove()) {
+    showGameOver();
   }
   render();
 }
 
-startElement.addEventListener("click", () => {
+function startGame(): void {
   game.start();
   turn++;
   const startTurn = turn;
+  gameOver = false;
+  gameOverElement.hidden = true;
+  startElement.focus();
   upcomingBalls = [game.randomBall(), game.randomBall(), game.randomBall()];
   moving = true;
   clearingCells.clear();
@@ -293,7 +325,10 @@ startElement.addEventListener("click", () => {
   renderNextBalls();
   render();
   void addRandomBallsWithAnimation(3, startTurn);
-});
+}
+
+startElement.addEventListener("click", startGame);
+gameOverRestartElement.addEventListener("click", startGame);
 
 window.setInterval(() => {
   if (game.selected) {

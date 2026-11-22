@@ -45,6 +45,24 @@ export class NexusGame {
     return cells;
   }
 
+  hasAvailableMove(): boolean {
+    const freeCells = this.freeCells();
+    if (freeCells.length === 0) return false;
+
+    for (let row = 0; row < BOARD_SIZE; row++) {
+      for (let col = 0; col < BOARD_SIZE; col++) {
+        if (
+          this.board[row][col] !== 0 &&
+          freeCells.some((cell) => this.findPath({ row, col }, cell) !== null)
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   addBall(row: number, col: number, ball: Ball): void {
     this.board[row][col] = ball;
   }

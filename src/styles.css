@@ -77,14 +77,120 @@ h1 span {
   gap: 16px;
 }
 
+.board-wrap {
+  display: grid;
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1;
+}
+
 .board {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   aspect-ratio: 1;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   border: 1px solid #475569;
   background: #111827;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+}
+
+.game-over {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 4vw, 28px);
+  background: rgba(5, 10, 22, 0.78);
+  backdrop-filter: blur(7px);
+  animation: game-over-appear 220ms ease-out;
+}
+
+.game-over[hidden] {
+  display: none;
+}
+
+.game-over-card {
+  width: min(100%, 340px);
+  padding: clamp(20px, 5vw, 32px);
+  border: 1px solid rgba(125, 211, 252, 0.32);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 0, rgba(56, 189, 248, 0.2), transparent 55%),
+    linear-gradient(145deg, rgba(30, 41, 59, 0.98), rgba(11, 18, 33, 0.98));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 32px rgba(14, 165, 233, 0.12);
+  text-align: center;
+}
+
+.game-over-eyebrow {
+  color: #7dd3fc;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.game-over-card h2 {
+  margin: 8px 0 6px;
+  color: #f8fafc;
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.07em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.game-over-copy {
+  margin: 0;
+  color: #aab8ca;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.game-over-score {
+  display: grid;
+  gap: 5px;
+  margin: 20px 0;
+  color: #94a3b8;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.game-over-score strong {
+  color: #fff;
+  font-family: "Courier New", monospace;
+  font-size: 1.65rem;
+  letter-spacing: 0.08em;
+}
+
+.game-over button {
+  width: 100%;
+  height: 46px;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 150ms ease, transform 150ms ease;
+}
+
+.game-over button:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+@keyframes game-over-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .cell {
@@ -197,7 +303,7 @@ h1 span {
     gap: 10px;
   }
 
-  .board {
+  .board-wrap {
     width: min(100%, calc(100dvh - 150px));
     justify-self: center;
   }
