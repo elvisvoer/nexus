@@ -14,10 +14,7 @@ body {
   min-width: 320px;
   min-height: 100dvh;
   overflow-x: hidden;
-  background:
-    radial-gradient(circle at 20% 15%, rgba(56, 189, 248, 0.08), transparent 24rem),
-    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08), transparent 28rem),
-    #090d18;
+  background: #090d18;
 }
 
 button {
@@ -117,9 +114,7 @@ h1 span {
   padding: clamp(20px, 5vw, 32px);
   border: 1px solid rgba(125, 211, 252, 0.32);
   border-radius: 18px;
-  background:
-    radial-gradient(circle at 50% 0, rgba(56, 189, 248, 0.2), transparent 55%),
-    linear-gradient(145deg, rgba(30, 41, 59, 0.98), rgba(11, 18, 33, 0.98));
+  background: #0b1221;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 32px rgba(14, 165, 233, 0.12);
   text-align: center;
 }
