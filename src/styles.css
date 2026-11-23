@@ -163,20 +163,6 @@ h1 span {
 
 .game-over button {
   width: 100%;
-  height: 46px;
-  border-radius: 7px;
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: filter 150ms ease, transform 150ms ease;
-}
-
-.game-over button:hover {
-  filter: brightness(1.15);
-  transform: translateY(-1px);
 }
 
 @keyframes game-over-appear {
@@ -246,7 +232,8 @@ h1 span {
   background-size: cover;
 }
 
-.controls button {
+.controls button,
+.game-over button {
   height: 44px;
   border-radius: 6px;
   border: 1px solid #334155;
@@ -299,7 +286,8 @@ h1 span {
     grid-template-columns: 1fr 1fr;
   }
 
-  .controls button {
+  .controls button,
+  .game-over button {
     height: 50px;
     font-size: 0.68rem;
   }
