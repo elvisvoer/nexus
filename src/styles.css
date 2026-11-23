@@ -90,7 +90,6 @@ h1 span {
   overflow: hidden;
   border: 1px solid #475569;
   background: #111827;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
 }
 
 .game-over {
