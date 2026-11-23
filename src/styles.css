@@ -206,10 +206,6 @@ h1 span {
   outline: none;
 }
 
-.cell:hover {
-  filter: brightness(1.12);
-}
-
 .cell.clearing {
   animation: line-clear-blink 300ms ease-in-out 2;
 }
