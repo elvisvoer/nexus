@@ -232,9 +232,10 @@ h1 span {
 
 .controls button,
 .game-over button {
+  background: #0284c7;
   height: 44px;
-  border-radius: 6px;
-  border: 1px solid #334155;
+  border-radius: 8px;
+  border: 0;
   color: #fff;
   font-weight: 750;
   cursor: pointer;
@@ -246,13 +247,6 @@ h1 span {
 .controls button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-}
-
-.controls .primary,
-.game-over .primary {
-  background: #0284c7;
-  border-color: #38bdf8;
-  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.18);
 }
 
 @media (max-width: 600px) {
