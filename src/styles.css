@@ -1,6 +1,6 @@
 :root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #e5e7eb;
+  color: white;
   background: #090d18;
   font-synthesis: none;
 }
@@ -51,7 +51,6 @@ h1 span {
   display: flex;
   gap: 12px;
   text-align: right;
-  color: #fff;
   font-weight: 800;
   text-transform: uppercase;
   font-size: 0.7rem;
@@ -111,7 +110,6 @@ h1 span {
 .game-over-card {
   width: min(100%, 340px);
   padding: clamp(20px, 5vw, 32px);
-  border: 1px solid rgba(125, 211, 252, 0.32);
   border-radius: 18px;
   background: #0b1221;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 32px rgba(14, 165, 233, 0.12);
@@ -128,7 +126,6 @@ h1 span {
 
 .game-over-card h2 {
   margin: 8px 0 6px;
-  color: #f8fafc;
   font-size: clamp(2rem, 8vw, 3rem);
   font-weight: 900;
   letter-spacing: -0.07em;
@@ -138,7 +135,6 @@ h1 span {
 
 .game-over-copy {
   margin: 0;
-  color: #aab8ca;
   font-size: 0.88rem;
   line-height: 1.5;
 }
@@ -147,14 +143,12 @@ h1 span {
   display: grid;
   gap: 5px;
   margin: 20px 0;
-  color: #94a3b8;
   font-size: 0.66rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .game-over-score strong {
-  color: #fff;
   font-family: "Courier New", monospace;
   font-size: 1.65rem;
   letter-spacing: 0.08em;
@@ -209,7 +203,6 @@ h1 span {
 }
 
 .next-balls-label {
-  color: #fff;
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -232,11 +225,11 @@ h1 span {
 
 .controls button,
 .game-over button {
+  color: white;
   background: #0284c7;
   height: 44px;
   border-radius: 8px;
   border: 0;
-  color: #fff;
   font-weight: 750;
   cursor: pointer;
   text-transform: uppercase;
