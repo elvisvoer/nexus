@@ -1,5 +1,11 @@
 import "./styles.css";
-import { BOARD_SIZE, NexusGame, type Ball, type Cell } from "./game";
+import {
+  BOARD_SIZE,
+  NexusGame,
+  type Ball,
+  type Cell,
+  type CellValue,
+} from "./game";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root not found");
@@ -63,6 +69,7 @@ const finalScoreElement = document.querySelector<HTMLElement>("#final-score")!;
 const gameOverRestartElement =
   document.querySelector<HTMLButtonElement>("#game-over-restart")!;
 const highScoreStorageKey = "nexus-2k-high-score";
+const gameStorageKey = "nexus-2k-game";
 let moving = false;
 let gameOver = false;
 let turn = 0;
@@ -106,6 +113,135 @@ let upcomingBalls: Ball[] = [
   game.randomBall(),
   game.randomBall(),
 ];
+
+interface SavedGame {
+  version: 1;
+  board: CellValue[][];
+  score: number;
+  started: boolean;
+  selected: Cell | null;
+  upcomingBalls: Ball[];
+  gameOver: boolean;
+}
+
+function isCell(value: unknown): value is Cell {
+  if (typeof value !== "object" || value === null) return false;
+  const cell = value as Record<string, unknown>;
+  return (
+    typeof cell.row === "number" &&
+    Number.isInteger(cell.row) &&
+    cell.row >= 0 &&
+    cell.row < BOARD_SIZE &&
+    typeof cell.col === "number" &&
+    Number.isInteger(cell.col) &&
+    cell.col >= 0 &&
+    cell.col < BOARD_SIZE
+  );
+}
+
+function isBall(value: unknown): value is Ball {
+  return (
+    typeof value === "number" &&
+    Number.isInteger(value) &&
+    value >= 1 &&
+    value <= 5
+  );
+}
+
+function isBoard(value: unknown): value is CellValue[][] {
+  return (
+    Array.isArray(value) &&
+    value.length === BOARD_SIZE &&
+    value.every(
+      (row) =>
+        Array.isArray(row) &&
+        row.length === BOARD_SIZE &&
+        row.every((cell) => cell === 0 || isBall(cell)),
+    )
+  );
+}
+
+function isUpcomingBalls(value: unknown): value is Ball[] {
+  return (
+    Array.isArray(value) &&
+    value.length === 3 &&
+    value.every(isBall)
+  );
+}
+
+function loadGame(): SavedGame | null {
+  try {
+    const stored = window.localStorage.getItem(gameStorageKey);
+    if (stored === null) return null;
+    const saved: unknown = JSON.parse(stored);
+    if (typeof saved !== "object" || saved === null) throw new Error("Invalid save");
+    const state = saved as Record<string, unknown>;
+    const board = state.board;
+    const selected = state.selected;
+    const score = state.score;
+    if (
+      state.version !== 1 ||
+      !isBoard(board) ||
+      typeof score !== "number" ||
+      !Number.isSafeInteger(score) ||
+      score < 0 ||
+      typeof state.started !== "boolean" ||
+      (selected !== null && !isCell(selected)) ||
+      !isUpcomingBalls(state.upcomingBalls) ||
+      typeof state.gameOver !== "boolean"
+    ) {
+      throw new Error("Invalid save");
+    }
+
+    if (selected !== null && board[selected.row][selected.col] === 0) {
+      throw new Error("Invalid selection in save");
+    }
+    return {
+      version: 1,
+      board,
+      score,
+      started: state.started,
+      selected,
+      upcomingBalls: state.upcomingBalls,
+      gameOver: state.gameOver,
+    };
+  } catch (error) {
+    console.error("Unable to load saved game:", error);
+    return null;
+  }
+}
+
+function saveGame(): void {
+  const state: SavedGame = {
+    version: 1,
+    board: game.board,
+    score: game.score,
+    started: game.started,
+    selected: game.selected,
+    upcomingBalls,
+    gameOver,
+  };
+  try {
+    window.localStorage.setItem(gameStorageKey, JSON.stringify(state));
+  } catch (error) {
+    console.error("Unable to save game:", error);
+  }
+}
+
+const savedGame = loadGame();
+if (savedGame) {
+  game.board = savedGame.board;
+  game.score = savedGame.score;
+  game.started = savedGame.started;
+  game.selected = savedGame.selected;
+  upcomingBalls = savedGame.upcomingBalls;
+  gameOver = savedGame.gameOver;
+  startElement.textContent = game.started ? "Restart" : "Start";
+  gameOverElement.hidden = !gameOver;
+  if (gameOver) {
+    finalScoreElement.textContent = game.score.toString().padStart(8, "0");
+  }
+}
 
 const cells: HTMLButtonElement[][] = [];
 
@@ -179,6 +315,7 @@ function showGameOver(): void {
   finalScoreElement.textContent = game.score.toString().padStart(8, "0");
   gameOverElement.hidden = false;
   gameOverRestartElement.focus();
+  saveGame();
 }
 
 function animatePath(path: Cell[], expectedTurn: number): Promise<boolean> {
@@ -265,7 +402,10 @@ async function addRandomBallsWithAnimation(
   }
   if (turn === expectedTurn) moving = false;
   render();
-  if (turn === expectedTurn && !game.hasAvailableMove()) showGameOver();
+  if (turn === expectedTurn) {
+    if (!game.hasAvailableMove()) showGameOver();
+    saveGame();
+  }
 }
 
 async function handleCellClick(cell: Cell): Promise<void> {
@@ -275,6 +415,7 @@ async function handleCellClick(cell: Cell): Promise<void> {
   if (value !== 0) {
     game.selected = cell;
     render();
+    saveGame();
     return;
   }
 
@@ -309,6 +450,7 @@ async function handleCellClick(cell: Cell): Promise<void> {
     showGameOver();
   }
   render();
+  if (lineCompleted) saveGame();
 }
 
 function startGame(): void {
@@ -324,6 +466,7 @@ function startGame(): void {
   startElement.textContent = "Restart";
   renderNextBalls();
   render();
+  saveGame();
   void addRandomBallsWithAnimation(3, startTurn);
 }
 
