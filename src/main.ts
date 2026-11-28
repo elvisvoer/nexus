@@ -99,6 +99,7 @@ const ballImages = [
   assetUrl("green.png"),
   assetUrl("yellow.png"),
   assetUrl("purple.png"),
+  assetUrl("bleau.png"),
 ];
 
 const ballNames: Record<Ball, string> = {
@@ -107,6 +108,7 @@ const ballNames: Record<Ball, string> = {
   3: "Green",
   4: "Yellow",
   5: "Purple",
+  6: "Cyan",
 };
 let upcomingBalls: Ball[] = [
   game.randomBall(),
@@ -144,7 +146,7 @@ function isBall(value: unknown): value is Ball {
     typeof value === "number" &&
     Number.isInteger(value) &&
     value >= 1 &&
-    value <= 5
+    value <= 6
   );
 }
 

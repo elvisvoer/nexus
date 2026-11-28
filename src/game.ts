@@ -1,5 +1,5 @@
 export const BOARD_SIZE = 9;
-export type Ball = 1 | 2 | 3 | 4 | 5;
+export type Ball = 1 | 2 | 3 | 4 | 5 | 6;
 export type CellValue = 0 | Ball;
 
 export interface Cell {
@@ -183,7 +183,7 @@ export class NexusGame {
   }
 
   randomBall(): Ball {
-    return (Math.floor(Math.random() * 5) + 1) as Ball;
+    return (Math.floor(Math.random() * 6) + 1) as Ball;
   }
 
   addRandomBall(ball?: Ball): Cell | null {
