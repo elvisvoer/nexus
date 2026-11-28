@@ -74,6 +74,7 @@ let moving = false;
 let gameOver = false;
 let turn = 0;
 let selectionVisible = true;
+let clearingVisible = true;
 const clearingCells = new Set<string>();
 
 function loadHighScore(): number {
@@ -283,18 +284,16 @@ function render(): void {
         ? `url("${ballImages[value]}")`
         : `url("${assetUrl("free.png")}")`;
       cell.style.backgroundImage = baseImage;
+      const isSelected =
+        game.selected?.row === row && game.selected.col === col;
+      const isClearing = clearingCells.has(`${row}:${col}`);
 
+      if (isSelected) cell.classList.add("selected");
       if (
-        game.selected?.row === row &&
-        game.selected.col === col
+        (isSelected && selectionVisible) ||
+        (isClearing && clearingVisible)
       ) {
-        cell.classList.add("selected");
-        cell.style.backgroundImage = selectionVisible
-          ? `url("${assetUrl("selected.png")}"), ${baseImage}`
-          : baseImage;
-      }
-      if (clearingCells.has(`${row}:${col}`)) {
-        cell.classList.add("clearing");
+        cell.style.backgroundImage = `url("${assetUrl("selected.png")}"), ${baseImage}`;
       }
       cell.setAttribute(
         "aria-label",
@@ -369,6 +368,7 @@ async function clearLinesWithAnimation(
   const line = game.findLine(row, col);
   if (line.length === 0) return true;
 
+  clearingVisible = true;
   for (const cell of line) clearingCells.add(`${cell.row}:${cell.col}`);
   render();
   await delay(600);
@@ -481,6 +481,13 @@ window.setInterval(() => {
     render();
   }
 }, 300);
+
+window.setInterval(() => {
+  if (clearingCells.size > 0) {
+    clearingVisible = !clearingVisible;
+    render();
+  }
+}, 150);
 
 renderNextBalls();
 render();
